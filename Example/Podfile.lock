@@ -1,0 +1,23 @@
+PODS:
+  - RxCocoa (3.0.1):
+    - RxSwift (~> 3.0)
+  - RxSwift (3.0.1)
+  - RxUIAlertController (1.0.0):
+    - RxCocoa
+    - RxSwift
+
+DEPENDENCIES:
+  - RxUIAlertController (from `../`)
+
+EXTERNAL SOURCES:
+  RxUIAlertController:
+    :path: "../"
+
+SPEC CHECKSUMS:
+  RxCocoa: 15a52fc590dcc700cb4a690a633b5c5184ce3a78
+  RxSwift: af5680055c4ad04480189c52d28385b1029493a6
+  RxUIAlertController: 42cbc8e7113d667a3d1e069b111db90cabf696a8
+
+PODFILE CHECKSUM: e001db0045e2931dc0163727851e37d20de11750
+
+COCOAPODS: 1.1.1
