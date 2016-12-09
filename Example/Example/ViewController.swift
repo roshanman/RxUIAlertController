@@ -13,13 +13,8 @@ import RxCocoa
 
 class ViewController: UIViewController {
     let disposeBag = DisposeBag()
-        
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        // Do any additional setup after loading the view, typically from a nib.
-    }
 
-    @IBAction func testAlert(_ sender: Any) {
+    @IBAction func testAlert(_ sender: UIButton) {
         Alert(title: "Test", message: "This is a test message.")
             .addAction(title: "Yes")
             .addAction(title: "No", style: .destructive)
@@ -34,24 +29,17 @@ class ViewController: UIViewController {
             .addDisposableTo(disposeBag)
     }
     
-    @IBAction func testActionSheet(_ sender: Any) {
+    @IBAction func testActionSheet(_ sender: UIButton) {
         ActionSheet(title: "Test", message: "This is a test message.")
             .addAction(title: "Yes")
             .addAction(title: "No", style: .destructive)
             .addAction(title: "Cancel", style: .cancel)
+            .setPresenting(source: sender)
             .rx.show()
             .subscribe(onNext: {
                 print("button: \($0.buttonTitle)")
             })
             .addDisposableTo(disposeBag)
     }
-    
-    
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
-    }
-
-
 }
 
