@@ -24,11 +24,13 @@ public func ActionSheet(title: String?, message: String?) -> AlertController {
 public class AlertController: NSObject {
 
     public struct Result {
+        public let buttonIndex: Int
         public let buttonTitle: String
         public let controller: UIAlertController
 
-        init(alert: UIAlertController, button title: String) {
-            buttonTitle = title
+        init(alert: UIAlertController, buttonTitle: String, buttonIndex: Int) {
+            buttonTitle = buttonTitle
+            buttonIndex = buttonIndex
             controller  = alert
         }
     }
@@ -58,7 +60,8 @@ public class AlertController: NSObject {
         let action = UIAlertAction(title: title, style: style) { [unowned self] action in
             guard self != nil else { return }
 
-            let result = Result(alert: self.alertController, button: title)
+            let result = Result(alert: self.alertController, buttonTitle: title,
+                                buttonIndex: self.alertController.actions.indexOf(action) ?? 0)
 
             self.observer?.onNext(result)
             self.observer?.onCompleted()
@@ -74,7 +77,8 @@ public class AlertController: NSObject {
         let action = UIAlertAction(title: title, style: style) { [unowned self] action in
             guard self != nil else { return }
 
-            let result = Result(alert: self.alertController, button: title)
+            let result = Result(alert: self.alertController, buttonTitle: title,
+                                buttonIndex: self.alertController.actions.indexOf(action) ?? 0)
 
             self.observer?.onNext(result)
             self.observer?.onCompleted()
