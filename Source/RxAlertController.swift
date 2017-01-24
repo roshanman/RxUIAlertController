@@ -75,7 +75,7 @@ public class AlertController: NSObject {
 
     @available(iOS 9.0, *)
     public func addPreferredAction(title: String, style: UIAlertActionStyle = .default,
-                                   configure: ((UIAlertController, UIAlertAction) -> Void)? = nil)) -> Self {
+                                   configure: ((UIAlertController, UIAlertAction) -> Void)? = nil) -> Self {
         return addAction(title: title, style: style) { alertController, action in
           alertController.preferredAction = action
           configure?(alertController, action)
