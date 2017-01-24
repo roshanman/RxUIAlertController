@@ -56,38 +56,30 @@ public class AlertController: NSObject {
         retainSelf = self
     }
 
-    public func addAction(title:String, style:UIAlertActionStyle = .default, configure: ((UIAlertAction) -> Void)? = nil) -> Self {
+    public func addAction(title: String, style: UIAlertActionStyle = .default,
+                          configure: ((UIAlertController, UIAlertAction) -> Void)? = nil) -> Self {
         let action = UIAlertAction(title: title, style: style) { [unowned self] action in
             guard self != nil else { return }
 
             let result = Result(alert: self.alertController, buttonTitle: title,
-                                buttonIndex: self.alertController.actions.indexOf(action) ?? 0)
+                                buttonIndex: self.alertController.actions.index(of: action) ?? 0)
 
             self.observer?.onNext(result)
             self.observer?.onCompleted()
         }
-        configure?(action)
         alertController.addAction(action)
+        configure?(alertController, action)
 
         return self
     }
 
     @available(iOS 9.0, *)
-    public func addPreferredAction(title:String, style:UIAlertActionStyle = .default) -> Self {
-        let action = UIAlertAction(title: title, style: style) { [unowned self] action in
-            guard self != nil else { return }
-
-            let result = Result(alert: self.alertController, buttonTitle: title,
-                                buttonIndex: self.alertController.actions.indexOf(action) ?? 0)
-
-            self.observer?.onNext(result)
-            self.observer?.onCompleted()
+    public func addPreferredAction(title: String, style: UIAlertActionStyle = .default,
+                                   configure: ((UIAlertController, UIAlertAction) -> Void)? = nil)) -> Self {
+        return addAction(title: title, style: style) { alertController, action in
+          alertController.preferredAction = action
+          configure?(alertController, action)
         }
-
-        alertController.addAction(action)
-        alertController.preferredAction = action
-
-        return self
     }
 
     public func addTextField(configurationHandler: ((UITextField) -> Void)? = nil) -> Self {
