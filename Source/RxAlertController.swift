@@ -29,8 +29,8 @@ public class AlertController: NSObject {
         public let controller: UIAlertController
 
         init(alert: UIAlertController, buttonTitle: String, buttonIndex: Int) {
-            buttonTitle = buttonTitle
-            buttonIndex = buttonIndex
+            self.buttonTitle = buttonTitle
+            self.buttonIndex = buttonIndex
             controller  = alert
         }
     }
