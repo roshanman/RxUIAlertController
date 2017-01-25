@@ -22,13 +22,15 @@ public func ActionSheet(title: String?, message: String?) -> AlertController {
 
 @available(iOS 8.0, *)
 public class AlertController: NSObject {
-    
+
     public struct Result {
+        public let buttonIndex: Int
         public let buttonTitle: String
         public let controller: UIAlertController
-        
-        init(alert: UIAlertController, button title: String) {
-            buttonTitle = title
+
+        init(alert: UIAlertController, buttonTitle: String, buttonIndex: Int) {
+            self.buttonTitle = buttonTitle
+            self.buttonIndex = buttonIndex
             controller  = alert
         }
     }
@@ -37,12 +39,12 @@ public class AlertController: NSObject {
     internal var observer: AnyObserver<Result>?
     private  var retainSelf: Any?
     private  let disposeBag = DisposeBag()
-    
+
     init(title: String?, message: String?, preferredStyle: UIAlertControllerStyle) {
         alertController = .init(title:title, message:message, preferredStyle:preferredStyle)
-        
+
         super.init()
-        
+
         alertController.rx.sentMessage(#selector(UIViewController.viewDidDisappear(_:)))
             .subscribe(onNext: { [weak self] _ in
                 DispatchQueue.main.asyncAfter(deadline: .now() + DispatchTimeInterval.microseconds(300)) {
@@ -50,45 +52,39 @@ public class AlertController: NSObject {
                 }
             })
             .addDisposableTo(disposeBag)
-        
+
         retainSelf = self
     }
-    
-    public func addAction(title:String, style:UIAlertActionStyle = .default) -> Self {
+
+    public func addAction(title: String, style: UIAlertActionStyle = .default,
+                          configure: ((UIAlertController, UIAlertAction) -> Void)? = nil) -> Self {
         let action = UIAlertAction(title: title, style: style) { [unowned self] action in
             guard self != nil else { return }
-            
-            let result = Result(alert: self.alertController, button: title)
-            
+
+            let result = Result(alert: self.alertController, buttonTitle: title,
+                                buttonIndex: self.alertController.actions.index(of: action) ?? 0)
+
             self.observer?.onNext(result)
             self.observer?.onCompleted()
         }
-        
         alertController.addAction(action)
-        
+        configure?(alertController, action)
+
         return self
     }
-    
+
     @available(iOS 9.0, *)
-    public func addPreferredAction(title:String, style:UIAlertActionStyle = .default) -> Self {
-        let action = UIAlertAction(title: title, style: style) { [unowned self] action in
-            guard self != nil else { return }
-
-            let result = Result(alert: self.alertController, button: title)
-            
-            self.observer?.onNext(result)
-            self.observer?.onCompleted()
+    public func addPreferredAction(title: String, style: UIAlertActionStyle = .default,
+                                   configure: ((UIAlertController, UIAlertAction) -> Void)? = nil) -> Self {
+        return addAction(title: title, style: style) { alertController, action in
+          alertController.preferredAction = action
+          configure?(alertController, action)
         }
-        
-        alertController.addAction(action)
-        alertController.preferredAction = action
-
-        return self
     }
-    
+
     public func addTextField(configurationHandler: ((UITextField) -> Void)? = nil) -> Self {
         alertController.addTextField(configurationHandler: configurationHandler)
-        
+
         return self
     }
 
@@ -106,34 +102,34 @@ public class AlertController: NSObject {
                 }
             }
         }
-        
+
         self.presentedController?.present(self.alertController,
                                           animated: animated,
                                           completion: completion)
-        
+
         return self
     }
-    
+
     private var presentedController:UIViewController? {
         if let viewController = UIApplication.shared.keyWindow?.rootViewController {
             //Find the presented view controller
             var presentedController = viewController
-            
+
             while presentedController.presentedViewController != nil &&
                   presentedController.presentedViewController?.isBeingDismissed == false
             {
                 presentedController = presentedController.presentedViewController!
             }
-            
+
             return presentedController
         }
-        
+
         return nil
     }
-    
+
     private var topViewController:UIViewController? {
         var topController = self.presentedController
-        
+
         while topController?.childViewControllers.last != nil {
             topController = topController?.childViewControllers.last!
         }
@@ -141,7 +137,7 @@ public class AlertController: NSObject {
         return topController
     }
 
-    
+
     /// For ActionSheet
     public func setBarButton(item: UIBarButtonItem) -> Self {
         guard UIDevice.current.userInterfaceIdiom == .pad else {
@@ -151,10 +147,10 @@ public class AlertController: NSObject {
         if let popoverController = alertController.popoverPresentationController {
             popoverController.barButtonItem = item
         }
-        
+
         return self
     }
-    
+
     /// For ActionSheet
     public func setPresenting(source: UIView) -> Self {
         guard UIDevice.current.userInterfaceIdiom == .pad else {
@@ -165,10 +161,10 @@ public class AlertController: NSObject {
             popoverController.sourceView = source
             popoverController.sourceRect = source.bounds
         }
-        
+
         return self
     }
-    
+
     deinit {
         //print("deinit")
     }
@@ -180,7 +176,7 @@ public extension Reactive where Base: AlertController {
 
         return Observable.create { observer in
             self.base.observer = observer
-            
+
             return Disposables.create()
         }
     }
