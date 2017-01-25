@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = "RxUIAlertController"
-  s.version          = "1.0.1"
+  s.version          = "1.1.0"
   s.summary          = "ReactiveX way to use UIAlertController on iOS."
   s.description      = <<-EOS
   RxSwift binding for [Permission](https://github.com/delba/Permission) API that helps you with UIAlertController in iOS.
