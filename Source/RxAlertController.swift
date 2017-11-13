@@ -51,7 +51,7 @@ public class AlertController: NSObject {
                     self?.retainSelf = nil
                 }
             })
-            .addDisposableTo(disposeBag)
+            .disposed(by: disposeBag)
 
         retainSelf = self
     }
@@ -59,7 +59,6 @@ public class AlertController: NSObject {
     public func addAction(title: String, style: UIAlertActionStyle = .default,
                           configure: ((UIAlertController, UIAlertAction) -> Void)? = nil) -> Self {
         let action = UIAlertAction(title: title, style: style) { [unowned self] action in
-            guard self != nil else { return }
 
             let result = Result(alert: self.alertController, buttonTitle: title,
                                 buttonIndex: self.alertController.actions.index(of: action) ?? 0)
