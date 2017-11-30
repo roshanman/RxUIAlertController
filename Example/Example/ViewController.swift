@@ -26,7 +26,7 @@ class ViewController: UIViewController {
                 print("button: \($0.buttonTitle)")
                 print($0.controller.textFields?.first?.text ?? "")
             })
-            .addDisposableTo(disposeBag)
+            .disposed(by: disposeBag)
     }
     
     @IBAction func testActionSheet(_ sender: UIButton) {
@@ -39,7 +39,7 @@ class ViewController: UIViewController {
             .subscribe(onNext: {
                 print("button: \($0.buttonTitle)")
             })
-            .addDisposableTo(disposeBag)
+            .disposed(by: disposeBag)
     }
 }
 

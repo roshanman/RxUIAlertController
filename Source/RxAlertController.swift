@@ -51,7 +51,7 @@ public class AlertController: NSObject {
                     self?.retainSelf = nil
                 }
             })
-            .addDisposableTo(disposeBag)
+            .disposed(by: disposeBag)
 
         retainSelf = self
     }
@@ -59,7 +59,6 @@ public class AlertController: NSObject {
     public func addAction(title: String, style: UIAlertActionStyle = .default,
                           configure: ((UIAlertController, UIAlertAction) -> Void)? = nil) -> Self {
         let action = UIAlertAction(title: title, style: style) { [unowned self] action in
-            guard self != nil else { return }
 
             let result = Result(alert: self.alertController, buttonTitle: title,
                                 buttonIndex: self.alertController.actions.index(of: action) ?? 0)
@@ -96,8 +95,13 @@ public class AlertController: NSObject {
             if let popOver = alertController.popoverPresentationController {
                 if popOver.sourceView == nil {
                     if let topVC = self.topViewController {
-                        popOver.sourceRect = topVC.view.bounds
                         popOver.sourceView = topVC.view
+                        popOver.sourceRect = CGRect(x: topVC.view.bounds.midX,
+                                                    y: topVC.view.bounds.midY,
+                                                    width: 0,
+                                                    height: 0)
+                        
+                        popOver.permittedArrowDirections = []
                     }
                 }
             }
@@ -160,6 +164,7 @@ public class AlertController: NSObject {
         if let popoverController = alertController.popoverPresentationController {
             popoverController.sourceView = source
             popoverController.sourceRect = source.bounds
+            popoverController.permittedArrowDirections = [.any]
         }
 
         return self
